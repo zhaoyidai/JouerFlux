@@ -12,6 +12,7 @@ db = SQLAlchemy(app)
 class Firewall(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
+    ip_address = db.Column(db.String(120), nullable=False)
 
 
 @app.route('/', methods=['GET'])
@@ -83,6 +84,11 @@ def get_firewalls():
                                 "id": "2"
                                 "name": "Firewall2"
                             }]
+            404:
+                description: firewalls not found error message.
+                content:
+                    application/json:
+                        example: {'message': 'empty table'}
         """
     firewalls = Firewall.query.all()
     if not firewalls:
@@ -98,6 +104,31 @@ def get_firewalls():
 
     return jsonify(data), 200
 
+@app.route('/firewall/<int:id>', methods=['DELETE'])
+def delete_f(id):
+    """
+        DELETE /firewall/<int:id>
+        Deletes an existing firewall from the db.
+
+        Path Parameters:
+            id (int): The ID of the firewall to delete.
+
+        Responses:
+            200:
+                description: Success message.
+                content:
+                    application/json:
+                        example: {'message': 'Firewall deleted'}
+            404:
+                description: Intervention not found error message.
+                content:
+                    application/json:
+                        example: {'message': 'Firewall not found'}
+        """
+    firewall = Firewall.query.get_or_404(id)
+    db.session.delete(firewall)
+    db.session.commit()
+    return jsonify({'message': f'firewall {id} deleted'}), 200
 
 if __name__ == '__main__':
     app.run()
