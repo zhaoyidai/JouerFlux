@@ -44,8 +44,25 @@ def get_firewalls():
 
 
 @firewall_bp.route('/firewall/<int:id>', methods=['DELETE'])
+@jwt_required()
+@admin_required
 def delete_firewall(id):
     firewall = Firewall.query.get_or_404(id)
     db.session.delete(firewall)
     db.session.commit()
     return jsonify({'message': f'firewall {id} deleted'}), 200
+
+
+# search firewalls by IP address
+@firewall_bp.route('/firewall/search', methods=['GET'])
+@jwt_required()
+def search_firewalls_by_ip():
+    ip_address = request.args.get('ip_address')
+    if not ip_address:
+        return jsonify({'message': 'IP address is required to search'}), 400
+
+    firewalls = Firewall.query.filter_by(ip_address=ip_address).all()
+    if not firewalls:
+        return jsonify({'message': 'No firewalls found for this IP address'}), 404
+
+    return firewalls_schema.jsonify(firewalls), 200

@@ -5,7 +5,6 @@
     "description": "API documentation for the JouerFlux application",
     "version": "1.0.0"
   },
-  "basePath": "/",
   "schemes": [
     "http"
   ],
@@ -39,7 +38,16 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Firewall"
+              "type": "object",
+              "properties": {
+                "ip_address": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": ["ip_address","name"]
             }
           }
         ],
@@ -49,8 +57,71 @@
           }
         }
       }
+    },
+    "/firewall/{id}": {
+      "delete": {
+        "summary": "Delete a firewall",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Firewall deleted"
+          },
+          "404": {
+            "description": "Firewall not found"
+          }
+
+      }
     }
   },
+    "/firewall/search": {
+      "get": {
+        "summary": "Search firewalls by IP address",
+        "parameters": [
+          {
+            "name": "ip_address",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of firewalls",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Firewall"
+              }
+            }
+          },
+          "400": {
+            "description": "IP address is required to search"
+          },
+          "404": {
+            "description": "No firewalls found for this IP address"
+          }
+        }
+      }
+    }
+  },
+
   "definitions": {
     "Firewall": {
       "type": "object",

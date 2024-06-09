@@ -39,8 +39,12 @@ def login():
     return jsonify(access_token=access_token), 200
 
 
-@auth_bp.route('/protected', methods=['GET'])
+@auth_bp.route('/role', methods=['GET'])
 @jwt_required()
 def protected():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+
+# reset password
+# delete user for super admin
