@@ -1,0 +1,77 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "JouerFlux API",
+    "description": "API documentation for the JouerFlux application",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/firewall": {
+      "get": {
+        "summary": "Get all firewalls",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "A list of firewalls",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Firewall"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new firewall",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Firewall"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Firewall created"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Firewall": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "ip_address": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

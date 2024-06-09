@@ -1,9 +1,12 @@
 from flask import Blueprint, request, jsonify
-from app import db
+from run import db
 from app.models import Firewall
 from app.schemas import firewall_schema, firewalls_schema
+from flask_jwt_extended import jwt_required
+from app.utils import admin_required
 
 firewall_bp = Blueprint('firewall_bp', __name__)
+
 
 @firewall_bp.route('/', methods=['GET'])
 def init_firewall():
@@ -13,7 +16,10 @@ def init_firewall():
     db.session.commit()
     return "init database"
 
+
 @firewall_bp.route('/firewall', methods=['POST'])
+@jwt_required()
+@admin_required
 def create_firewall():
     data = request.get_json()
     name = data.get('name')
@@ -27,6 +33,7 @@ def create_firewall():
     db.session.commit()
     return firewall_schema.jsonify(firewall), 201
 
+
 @firewall_bp.route('/firewall', methods=['GET'])
 def get_firewalls():
     firewalls = Firewall.query.all()
@@ -34,6 +41,7 @@ def get_firewalls():
         return jsonify({'message': 'empty table'}), 404
 
     return firewalls_schema.jsonify(firewalls), 200
+
 
 @firewall_bp.route('/firewall/<int:id>', methods=['DELETE'])
 def delete_firewall(id):

@@ -1,4 +1,4 @@
-from . import ma
+from run import ma
 from .models import Firewall, Policy, Rule
 
 class FirewallSchema(ma.SQLAlchemyAutoSchema):

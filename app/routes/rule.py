@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app import db
+from run import db
 from app.models import Policy, Rule
 from app.schemas import rule_schema, rules_schema
 
@@ -36,7 +36,7 @@ def get_rules():
 
 
 @rule_bp.route('/rule/<int:p_id>', methods=['GET'])
-def get_rules(p_id):
+def get_rules_p(p_id):
     policy = Policy.query.get(p_id)
     if not policy:
         return jsonify({'message': 'Policy does not exist'}), 400

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app import db
+from run import db
 from app.models import Policy, Firewall
 from app.schemas import policy_schema, policies_schema
 
