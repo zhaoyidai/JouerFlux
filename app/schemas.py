@@ -2,6 +2,7 @@ from run import ma
 from .models import Firewall, Policy, Rule
 
 
+# eviter serialization manuellement
 class FirewallSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Firewall

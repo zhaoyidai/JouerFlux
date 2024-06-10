@@ -4,11 +4,9 @@ from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 
-from app.routes.firewall import firewall_bp
-from app.routes.policy import policy_bp
-from app.routes.rule import rule_bp
-from app.errors import errors
-from app.auth import auth_bp
+
+
+
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -23,10 +21,19 @@ ma.init_app(app)
 jwt = JWTManager(app)
 
 # register blueprints
+from app.routes.firewall import firewall_bp
 app.register_blueprint(firewall_bp)
+
+from app.routes.policy import policy_bp
 app.register_blueprint(policy_bp)
+
+from app.routes.rule import rule_bp
 app.register_blueprint(rule_bp)
+
+from app.errors import errors
 app.register_blueprint(errors)
+
+from app.auth import auth_bp
 app.register_blueprint(auth_bp, url_prefix='/auth')
 
 # Swagger
