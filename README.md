@@ -15,6 +15,8 @@ Néanmoins, l'application devra comporter au moins les éléments suivants :
 - Un README
 - BONUS : un Dockerfile permettant de tester facilement l'application
 
+
+
 ## Fonctionnalités de base
 
 ### Gestion des Firewalls
@@ -35,13 +37,45 @@ Néanmoins, l'application devra comporter au moins les éléments suivants :
 ## Fonctionnalités ajoutées
 
 ### Authentification et Autorisation Avancées
-- **Mettre en place authetification et des rôles utilisateur** Permet de se connecter avec différents niveaux d'accès et de permissions.
+- **Mettre en place authetification et des rôles utilisateur** : Permet de se connecter avec différents niveaux d'accès et de permissions.
 
-### Mise à jour des Règles
-- **Mettre à jour une règle** : Permet de mettre à jour les détails d'une règle existante. Cette fonctionnalité a été ajoutée pour permettre une gestion plus flexible des règles de filtrage.
+    Il y a deux type d'utilisateur : user et admin. 
+    ### Endpoints et Permissions
+
+| Méthode | Endpoint           | Description                                    | Accès                   |
+|---------|--------------------|------------------------------------------------|-------------------------|
+| GET     | /firewall          | Obtenir tous les firewalls                     | Ouvert à tous           |
+| POST    | /firewall          | Créer un nouveau firewall                      | Admin uniquement        |
+| DELETE  | /firewall/{id}     | Supprimer un firewall                          | Admin uniquement        |
+| GET     | /firewall/search   | Rechercher des firewalls par adresse IP        | Utilisateurs et Admin   |
+| POST    | /policy            | Créer une nouvelle politique                   | Admin uniquement        |
+| GET     | /policy/{id}       | Obtenir les politiques pour un firewall        | Utilisateurs et Admin   |
+| DELETE  | /policy/{id}       | Supprimer une politique                        | Admin uniquement        |
+| GET     | /rules             | Obtenir toutes les règles pour un firewall (avec pagination) | Utilisateurs et Admin |
+| GET     | /rule/{id}         | Obtenir toutes les règles par ID de politique  | Utilisateurs et Admin   |
+| PUT     | /rule/{id}         | Mettre à jour une règle existante              | Admin uniquement        |
+| DELETE  | /rule/{id}         | Supprimer une règle                            | Admin uniquement        |
+
+#### Gestion des Rôles et Permissions
+
+Pour garantir que seules les actions appropriées soient effectuées par les utilisateurs autorisés, j'ai utilisé les fonctions dans `werkzeug` et `flask_jwt_extended`:
+
+- Utiliser JWT pour la gestion des sessions permet une intégration simple avec Swagger, où les tokens Bearer peuvent être facilement utilisés pour authentifier les requêtes. C'est la méthode plus simple et directe.
+
+#### Décorateurs Personnalisés pour l'Admin
+
+J'ai défini un décorateur personnalisé pour vérifier le rôle de l'utilisateur avant d'autoriser l'accès à certaines routes. Ce décorateur garantit que seules les personnes ayant le rôle d'admin peuvent ajouter, supprimer ou modifier des entrées.
 
 ### Utilisation de Templates pour les Politiques de Filtrage
-- **Création de politiques avec templates** : Permet de créer des politiques de filtrage avec des règles prédéfinies en utilisant des templates. Deux templates ont été définis : `basic` et `strict`. Cette fonctionnalité facilite la configuration rapide des politiques de filtrage.
+- **Création de politiques avec templates** : Permet de créer des politiques de filtrage avec des règles prédéfinies en utilisant des templates. 
+
+- Deux templates ont été définis : `basic` et `strict`. Cette fonctionnalité facilite la configuration rapide des politiques de filtrage et des règles.
+
+### Mise à jour des Règles
+- **Mettre à jour une règle** : Permet de mettre à jour les détails d'une règle existante. Cette fonctionnalité a été ajoutée pour permettre une gestion plus flexible des règles.
+- Bien que la mise à jour soit possible pour les firewalls et les politiques, j'ai particulièrement mis l'accent sur la personnalisation des règles. Cela s'explique par le fait que utilisateurs ont la possibilité de créer des règles à partir de templates. Ainsi, pour une compatibilité et une flexibilité maximales, les utilisateurs peuvent également personnaliser ces règles selon leurs besoins spécifiques.
+
+
 
 ### Recherche de Firewalls par Adresse IP
 - **Rechercher un firewall par adresse IP** : Permet de rechercher des firewalls en fonction de leur adresse IP. Cette fonctionnalité est utile pour retrouver rapidement un firewall spécifique.
@@ -89,15 +123,27 @@ Si j'avais plus de temps, voici quelques améliorations que j'envisagerais d'app
 1. **Tests Unitaires et d'Intégration**
     - Écrire des tests unitaires et d'intégration pour garantir la robustesse et la qualité du code.
 
-2. **Interface Utilisateur**
-    - Développer une interface utilisateur front-end pour rendre l'application plus conviviale.
+2. Journalisation et Suivi des Activités
+Mettre en place un système de journalisation(logging) pour surveiller et enregistrer les activités des utilisateurs, ce qui peut aider à :
+    - Détecter et prévenir les comportements malveillants.
+    - Analyser les actions pour améliorer l'application.
 
-3. **Optimisation des Performances**
-    - Optimiser les requêtes à la base de données et améliorer les performances globales de l'application.
+3. Gestion des sessions : 
+    Implémenter un système de rafraîchissement des tokens, Ajouter des délais d'expiration plus fins pour les tokens d'accès et de rafraîchissement
+
+4. Dans l'environnement de production, on utilise normalement un serveur WGSI comme Guinicorn, mais c'est un application légere donc je n'ai pas mettre en place cela.
+
+5. Gestion d'utilisateur : Mettre en place des fonctionnalités comme réinitialiser leur mot de passe en cas d'oubli, ajouter des rôles supplémentaires, implémenter l'authentification à deux facteurs pour la sécurité
 
 
 
 
+### Tester API
+Accédez à la documentation Swagger de l'API via : `/swagger`
 
-### Documentation API
-Accédez à la documentation Swagger de l'API via : /swagger
+si vous souhaitez tester avec une BDD vide, supprimez jouerflux.db dans instance et accedez à `/`, il réinitialiser la BDD et ajouter un example de firewall.
+
+Comment connecter 
+`Bearer <copy_your_token>`
+
+
