@@ -119,8 +119,272 @@
           }
         }
       }
+    },
+    "/policy": {
+      "post": {
+        "summary": "Create a new policy with or without a selected template",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "firewall_id": {
+                  "type": "integer"
+                },
+                "template": {
+                  "type": "string",
+                  "enum": ["basic", "strict"]
+                }
+              },
+              "required": ["name", "firewall_id"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Policy created with the selected template"
+          },
+          "400": {
+            "description": "Name and firewall ID cannot be empty or invalid template"
+          },
+          "404": {
+            "description": "Firewall does not exist"
+          }
+
+      }
     }
-  },
+    },
+    "/policy/{id}": {
+      "get": {
+        "summary": "Get policies for a specific firewall",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of policies",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Policy"
+              }
+            }
+          },
+          "400": {
+            "description": "Firewall does not exist"
+          },
+          "404": {
+            "description": "No policies found"
+          }
+
+      }
+      },
+      "delete": {
+        "summary": "Delete a policy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Policy deleted"
+          },
+          "404": {
+            "description": "Policy not found"
+          }
+
+      }
+    }
+    },
+    "/rules": {
+      "get": {
+        "summary": "Get all rules for a firewall with pagination",
+        "parameters": [
+          {
+            "name": "firewall_id",
+            "in": "query",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "default": 1
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "default": 10
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of rules",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Rule"
+              }
+            }
+          },
+          "400": {
+            "description": "Firewall ID is required"
+          },
+          "404": {
+            "description": "No rules found"
+          }
+
+      }
+    }
+    },
+    "/rule/{id}": {
+      "get": {
+        "summary": "Get all rules by a policy id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of Rules",
+            "schema": {
+              "type": "array",
+              "$ref": "#/definitions/Rule"
+            }
+          },
+          "400": {
+            "description": "Policy does not exist"
+          },
+          "404": {
+            "description": "No rules for this policy"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update an existing rule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "type": "string"
+                },
+                "destination": {
+                  "type": "string"
+                },
+                "action": {
+                  "type": "string"
+                }
+              },
+              "required": ["source", "destination", "action"]
+            }
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule updated",
+            "schema": {
+              "$ref": "#/definitions/Rule"
+            }
+          },
+          "400": {
+            "description": "Source, destination, and action are required"
+          },
+          "404": {
+            "description": "Rule not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a rule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rule deleted"
+          },
+          "404": {
+            "description": "Rule not found"
+          }
+
+      }
+    }
+    }
+    },
 
   "definitions": {
     "Firewall": {
@@ -133,6 +397,37 @@
           "type": "string"
         },
         "ip_address": {
+          "type": "string"
+        }
+      }
+    },
+    "Policy": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "firewall_id": {
+          "type": "integer"
+        }
+      }
+    },
+    "Rule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "source": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "string"
+        },
+        "action": {
           "type": "string"
         }
       }

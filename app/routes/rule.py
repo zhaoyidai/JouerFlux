@@ -8,6 +8,7 @@ from app.schemas import rule_schema, rules_schema
 rule_bp = Blueprint('rule_bp', __name__)
 
 
+# ajouter nouvelle regle, admin
 @rule_bp.route('/rule', methods=['POST'])
 @jwt_required()
 @admin_required
@@ -30,16 +31,7 @@ def create_rule():
     return rule_schema.jsonify(rule), 201
 
 
-@rule_bp.route('/rule', methods=['GET'])
-@jwt_required()
-def get_rules():
-    rules = Rule.query.all()
-    if not rules:
-        return jsonify({'message': 'no rule'}), 404
-
-    return rules_schema.jsonify(rules), 200
-
-
+# Liste des regles pour une politique, user
 @rule_bp.route('/rule/<int:p_id>', methods=['GET'])
 @jwt_required()
 def get_rules_p(p_id):
@@ -54,6 +46,7 @@ def get_rules_p(p_id):
     return rules_schema.jsonify(rules), 200
 
 
+# Supprimer une regle a partir d'un id, admin
 @rule_bp.route('/rule/<int:rule_id>', methods=['DELETE'])
 @jwt_required()
 @admin_required
@@ -63,9 +56,34 @@ def delete_rule(rule_id):
     db.session.commit()
     return jsonify({'message': f'rule {rule_id} deleted'}), 200
 
+# modifier une regle( pas policy id ), admin
+@rule_bp.route('/rule/<int:rule_id>', methods=['PUT'])
+@jwt_required()
+@admin_required
+def update_rule(rule_id):
+    data = request.get_json()
+    rule = Rule.query.get_or_404(rule_id)
+    if not rule:
+        return jsonify({'message': 'Rule not found'}), 404
+    source = data.get('source')
 
-# all rules for a firewall
-# add pagination
+    destination = data.get('destination')
+    action = data.get('action')
+
+    if not source or not destination or not action:
+        return jsonify({'message': 'Source, destination, and action are required'}), 400
+
+    rule.source = source
+    rule.destination = destination
+    rule.action = action
+
+    db.session.commit()
+
+    return rule_schema.jsonify(rule), 200
+
+
+# liste des regles pour un firewall, user
+# pagination ok
 @rule_bp.route('/rules', methods=['GET'])
 @jwt_required()
 def get_rules_for_firewall():
@@ -76,8 +94,10 @@ def get_rules_for_firewall():
     firewall = Firewall.query.get(firewall_id)
     if not firewall:
         return jsonify({'message': 'Firewall not found'}), 404
-
+    # join table policy
     rules_query = Rule.query.join(Policy).filter(Policy.firewall_id == firewall_id)
+    if not rules_query:
+        return jsonify({'message': 'no rules defined'}), 404
     paginated_rules = paginate_query(rules_query, rules_schema)
 
     if isinstance(paginated_rules, tuple) and isinstance(paginated_rules[1], int):

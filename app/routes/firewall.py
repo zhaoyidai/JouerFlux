@@ -9,6 +9,7 @@ firewall_bp = Blueprint('firewall_bp', __name__)
 
 
 @firewall_bp.route('/', methods=['GET'])
+# init database, creation tables, add one example firewall
 def init_firewall():
     db.create_all()
     example_f = Firewall(name='Example1', ip_address='192.168.0.1')
@@ -17,6 +18,7 @@ def init_firewall():
     return "init database"
 
 
+# add new firewall, admin role
 @firewall_bp.route('/firewall', methods=['POST'])
 @jwt_required()
 @admin_required
@@ -34,6 +36,7 @@ def create_firewall():
     return firewall_schema.jsonify(firewall), 201
 
 
+# list of firewalls
 @firewall_bp.route('/firewall', methods=['GET'])
 def get_firewalls():
     firewalls = Firewall.query.all()
@@ -43,6 +46,7 @@ def get_firewalls():
     return firewalls_schema.jsonify(firewalls), 200
 
 
+# delete one firewall by id, admin role
 @firewall_bp.route('/firewall/<int:id>', methods=['DELETE'])
 @jwt_required()
 @admin_required
@@ -53,7 +57,7 @@ def delete_firewall(id):
     return jsonify({'message': f'firewall {id} deleted'}), 200
 
 
-# search firewalls by IP address
+# search firewalls by IP address, user role
 @firewall_bp.route('/firewall/search', methods=['GET'])
 @jwt_required()
 def search_firewalls_by_ip():

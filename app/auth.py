@@ -6,7 +6,7 @@ from app.models import User
 
 auth_bp = Blueprint('auth_bp', __name__)
 
-
+# nouveau utilisateur, definir role
 @auth_bp.route('/register', methods=['POST'])
 def register():
 
@@ -14,6 +14,7 @@ def register():
     username = data.get('username')
     password = data.get('password')
     role = data.get('role', 'user')
+    # default role user
 
     if not username or not password:
         return jsonify({'message': 'Username and password are required'}), 400
@@ -25,6 +26,7 @@ def register():
     return jsonify({'message': 'User created'}), 201
 
 
+# se connecter pour un token de connexion
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -34,11 +36,12 @@ def login():
     user = User.query.filter_by(username=username).first()
     if not user or not check_password_hash(user.password, password):
         return jsonify({'message': 'Invalid user or password'}), 401
-
+    # generer token pour utilisateur connecte
     access_token = create_access_token(identity={'username': user.username, 'role': user.role})
     return jsonify(access_token=access_token), 200
 
 
+# savoir le role d'utilisateur connecte
 @auth_bp.route('/role', methods=['GET'])
 @jwt_required()
 def protected():
@@ -46,5 +49,3 @@ def protected():
     return jsonify(logged_in_as=current_user), 200
 
 
-# reset password
-# delete user for super admin

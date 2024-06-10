@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify
 errors = Blueprint('errors', __name__)
 
 
+# si des errors ne sont pas traitees dans les methodes
 @errors.app_errorhandler(404)
 def not_found_error(error):
     return jsonify({"error": f"Not found, {error}"}), 404
