@@ -15,8 +15,6 @@ Néanmoins, l'application devra comporter au moins les éléments suivants :
 - Un README
 - BONUS : un Dockerfile permettant de tester facilement l'application
 
-
-
 ## Fonctionnalités de base
 
 ### Gestion des Firewalls
@@ -37,10 +35,9 @@ Néanmoins, l'application devra comporter au moins les éléments suivants :
 ## Fonctionnalités ajoutées
 
 ### Authentification et Autorisation Avancées
-- **Mettre en place authetification et des rôles utilisateur** : Permet de se connecter avec différents niveaux d'accès et de permissions.
+- **Mise en place de l'authentification et des rôles utilisateur** : Permet de se connecter avec différents niveaux d'accès et de permissions.
 
-    Il y a deux type d'utilisateur : user et admin. 
-    ### Endpoints et Permissions
+#### Gestion des Rôles et Permissions
 
 | Méthode | Endpoint           | Description                                    | Accès                   |
 |---------|--------------------|------------------------------------------------|-------------------------|
@@ -56,9 +53,7 @@ Néanmoins, l'application devra comporter au moins les éléments suivants :
 | PUT     | /rule/{id}         | Mettre à jour une règle existante              | Admin uniquement        |
 | DELETE  | /rule/{id}         | Supprimer une règle                            | Admin uniquement        |
 
-#### Gestion des Rôles et Permissions
-
-Pour garantir que seules les actions appropriées soient effectuées par les utilisateurs autorisés, j'ai utilisé les fonctions dans `werkzeug` et `flask_jwt_extended`:
+Pour garantir que seules les actions appropriées soient effectuées par les utilisateurs autorisés, j'ai utilisé les fonctions dans `werkzeug` et `flask_jwt_extended` :
 
 - Utiliser JWT pour la gestion des sessions permet une intégration simple avec Swagger, où les tokens Bearer peuvent être facilement utilisés pour authentifier les requêtes. C'est la méthode plus simple et directe.
 
@@ -68,23 +63,21 @@ J'ai défini un décorateur personnalisé pour vérifier le rôle de l'utilisate
 
 ### Utilisation de Templates pour les Politiques de Filtrage
 - **Création de politiques avec templates** : Permet de créer des politiques de filtrage avec des règles prédéfinies en utilisant des templates. 
-
 - Deux templates ont été définis : `basic` et `strict`. Cette fonctionnalité facilite la configuration rapide des politiques de filtrage et des règles.
 
 ### Mise à jour des Règles
 - **Mettre à jour une règle** : Permet de mettre à jour les détails d'une règle existante. Cette fonctionnalité a été ajoutée pour permettre une gestion plus flexible des règles.
-- Bien que la mise à jour soit possible pour les firewalls et les politiques, j'ai particulièrement mis l'accent sur la personnalisation des règles. Cela s'explique par le fait que utilisateurs ont la possibilité de créer des règles à partir de templates. Ainsi, pour une compatibilité et une flexibilité maximales, les utilisateurs peuvent également personnaliser ces règles selon leurs besoins spécifiques.
-
-
+- Bien que la mise à jour soit possible pour les firewalls et les politiques, j'ai particulièrement mis l'accent sur la personnalisation des règles. Cela s'explique par le fait que les utilisateurs ont la possibilité de créer des règles à partir de templates. Ainsi, pour une compatibilité et une flexibilité maximales, les utilisateurs peuvent également personnaliser ces règles selon leurs besoins spécifiques.
 
 ### Recherche de Firewalls par Adresse IP
 - **Rechercher un firewall par adresse IP** : Permet de rechercher des firewalls en fonction de leur adresse IP. Cette fonctionnalité est utile pour retrouver rapidement un firewall spécifique.
 
 ### Pagination des Règles pour un Firewall
 - **Afficher et paginer les règles d'un firewall** : Permet d'afficher les règles associées à un firewall avec la possibilité de paginer les résultats. Cette fonctionnalité améliore la convivialité en permettant de naviguer facilement parmi un grand nombre de règles.
+- Pagination est dans `utils.py`, c'est possible d'appliquer pour d'autres vues. J'ai utilisé la fonction paginate de SQLAlchemy.
 
-
-**PEP 8** : J'ai essayé de respecter maximum
+### Conformité PEP 8
+J'ai essayé de respecter autant que possible les conventions PEP 8.
 
 ## Instructions pour tester l'application
 
@@ -100,9 +93,9 @@ J'ai défini un décorateur personnalisé pour vérifier le rôle de l'utilisate
     pip install -r requirements.txt
     ```
 
-3. Lancez l'application :
+3. Lancez l'application Flask :
     ```bash
-    flask run
+    python run.py
     ```
 
 ### Utilisation de Docker
@@ -118,32 +111,59 @@ J'ai défini un décorateur personnalisé pour vérifier le rôle de l'utilisate
 
 ## Améliorations futures
 
-Si j'avais plus de temps, voici quelques améliorations que j'envisagerais d'apporter :
+### 1. Tests Unitaires et d'Intégration
+- Écrire des tests unitaires et d'intégration pour garantir la robustesse et la qualité du code.
 
-1. **Tests Unitaires et d'Intégration**
-    - Écrire des tests unitaires et d'intégration pour garantir la robustesse et la qualité du code.
-
-2. Journalisation et Suivi des Activités
-Mettre en place un système de journalisation(logging) pour surveiller et enregistrer les activités des utilisateurs, ce qui peut aider à :
+### 2. Journalisation et Suivi des Activités
+- Mettre en place un système de journalisation (logging) pour surveiller et enregistrer les activités des utilisateurs, ce qui peut aider à :
     - Détecter et prévenir les comportements malveillants.
     - Analyser les actions pour améliorer l'application.
 
-3. Gestion des sessions : 
-    Implémenter un système de rafraîchissement des tokens, Ajouter des délais d'expiration plus fins pour les tokens d'accès et de rafraîchissement
+### 3. Gestion des Sessions
+- Implémenter un système de rafraîchissement des tokens.
+- Ajouter des délais d'expiration plus fins pour les tokens d'accès et de rafraîchissement.
 
-4. Dans l'environnement de production, on utilise normalement un serveur WGSI comme Guinicorn, mais c'est un application légere donc je n'ai pas mettre en place cela.
+### 4. Serveur WSGI
+- Dans l'environnement de production, utiliser un serveur WSGI comme Gunicorn pour des performances optimales.
 
-5. Gestion d'utilisateur : Mettre en place des fonctionnalités comme réinitialiser leur mot de passe en cas d'oubli, ajouter des rôles supplémentaires, implémenter l'authentification à deux facteurs pour la sécurité
+### 5. Gestion des Utilisateurs
+- Mettre en place des fonctionnalités comme la réinitialisation de mot de passe en cas d'oubli.
+- Ajouter des rôles supplémentaires.
+- Implémenter l'authentification à deux facteurs pour une sécurité renforcée.
+
+### Tester l'API
+Accédez à la documentation Swagger de l'API via : `/swagger`.
+
+Pour tester avec une base de données vide, supprimez `jouerflux.db` dans `instance` et accédez à `/`, cela réinitialisera la base de données et ajoutera un exemple de firewall.
 
 
 
+#### Comment obtenir un Token
 
-### Tester API
-Accédez à la documentation Swagger de l'API via : `/swagger`
+Pour obtenir un token, vous devez vous connecter avec vos identifiants via l'endpoint `/auth/login`. Voici comment procéder :
 
-si vous souhaitez tester avec une BDD vide, supprimez jouerflux.db dans instance et accedez à `/`, il réinitialiser la BDD et ajouter un example de firewall.
+1. Accédez à l'endpoint `/auth/login`.
+2. Connectez-vous en utilisant votre nom d'utilisateur et votre mot de passe.
+3. Le token sera retourné dans la réponse. Copiez ce token.
 
-Comment connecter 
-`Bearer <copy_your_token>`
 
+#### Comment se connecter :
+Ensuite, utilisez ce token pour autoriser vos requêtes en suivant les étapes suivantes :
+1. Cliquez sur `Authorize` dans la documentation Swagger.
+2. Saisissez `Bearer <votre_token>` dans le champ prévu à cet effet.
+3. Cliquez sur `Authorize` pour valider.
+
+    (4. Cliquer Logout pour déconnecter)
+
+Vous pouvez maintenant effectuer des requêtes authentifiées en utilisant ce token.
+
+
+Vous pouvez utiliser les identifiants d'exemple :
+
+| Nom d'utilisateur | Mot de passe | Rôle  |
+|-------------------|--------------|-------|
+| user              | 123          | user  |
+| admin             | 123          | admin |
+
+Il est possible de créer un nouvel utilisateur avec le rôle d'utilisateur ou d'administrateur. Vous pouvez vous déconnecter et vous reconnecter avec les nouveaux identifiants.
 
