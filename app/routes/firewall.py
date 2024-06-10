@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from run import db
+from app import db
 from app.models import Firewall
 from app.schemas import firewall_schema, firewalls_schema
 from flask_jwt_extended import jwt_required

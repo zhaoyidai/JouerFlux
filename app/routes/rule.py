@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from app.utils import admin_required, paginate_query
-from run import db
+from app import db
 from app.models import Policy, Rule, Firewall
 from app.schemas import rule_schema, rules_schema
 
