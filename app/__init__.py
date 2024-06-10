@@ -9,7 +9,7 @@ ma = Marshmallow()
 jwt = JWTManager()
 
 def create_app():
-    app = Flask(__name__, static_url_path='/static', static_folder='static')
+    app = Flask(__name__, static_url_path='/static', static_folder='../static')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jouerflux.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = 'secret_key'  # Change this!

@@ -58,6 +58,113 @@
         }
       }
     },
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "default": "user"
+                }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created"
+          },
+          "400": {
+            "description": "Username and password are required"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login to get an access token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              },
+              "required": ["username", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Access token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid user or password"
+          }
+        }
+      }
+    },
+    "/auth/role": {
+      "get": {
+        "summary": "Get the role of the logged-in user",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Role of the logged-in user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "logged_in_as": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/firewall/{id}": {
       "delete": {
         "summary": "Delete a firewall",
