@@ -1,4 +1,4 @@
-from run import ma
+from app import ma
 from .models import Firewall, Policy, Rule
 
 
